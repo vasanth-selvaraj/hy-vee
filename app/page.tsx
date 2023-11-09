@@ -1,113 +1,175 @@
-import Image from 'next/image'
+"use client";
+import { useState } from "react";
+import axios, { AxiosResponse } from "axios";
+import Image from "next/image";
+
+interface DogImage {
+  message: string;
+  status: string;
+}
+
+interface CatFact {
+  fact: string;
+  length: number;
+}
 
 export default function Home() {
+  const [selected, setSelected] = useState<string>("");
+
+  const [apiData, setApiData] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  async function handleSelect(event: React.ChangeEvent<HTMLSelectElement>) {
+    setLoading(true);
+    setSelected(event.target.value);
+    if (event.target.value === "Dog") {
+      try {
+        await axios
+          .get("https://dog.ceo/api/breeds/image/random")
+          .then((res: AxiosResponse<DogImage>) => {
+            setApiData(res.data.message);
+            setLoading(false);
+          });
+      } catch (err) {
+        setLoading(false);
+      }
+    } else if (event.target.value === "Cat") {
+      try {
+        await axios
+          .get("https://catfact.ninja/fact")
+          .then((res: AxiosResponse<CatFact>) => {
+            setApiData(res.data.fact);
+            setLoading(false);
+          });
+      } catch (err) {
+        setLoading(false);
+      }
+    }
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+    <div className="flex flex-col gap-8 h-screen w-screen items-center p-10">
+      <div
+        className={`flex flex-col gap-2 items-center justify-center p-4 transition-all duration-500 ease-in-out ${
+          selected !== "" ? "h-40 w-1/2" : "h-full w-1/2"
+        }`}
+      >
+        <label>Select an option :</label>
+        <select
+          onChange={(e) => handleSelect(e)}
+          className="w-40 rounded h-10 focus:outline-none p-2 bg-gray-200 border dark:bg-neutral-700 border-gray-300 dark:border-neutral-700 shadow-lg"
+        >
+          <option value="">Select</option>
+          <option value="Dog">Dog</option>
+          <option value="Cat">Cat</option>
+        </select>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <div
+        className={`border border-gray-300 bg-gradient-to-r dark:from-neutral-800 dark:to-neutral-900 from-gray-100 to-gray-200 shadow-md dark:bg-neutral-800 dark:border-neutral-700 flex justify-center items-center p-4 rounded ${
+          selected !== "" ? "flex opacity-100" : "opacity-0"
+        }`}
+      >
+        {selected === "Dog" ? (
+          <>
+            {!loading ? (
+              <div className="">
+                <h1 className="text-xl flex justify-center text-center items-baseline py-2">
+                  Here is a{" "}
+                  <span className="text-3xl px-2 font-bold bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">
+                    Dog
+                  </span>{" "}
+                  photo for you
+                </h1>
+                <Image
+                  src={apiData}
+                  height={400}
+                  width={400}
+                  alt="random dog"
+                  className="rounded"
+                  priority
+                />
+              </div>
+            ) : (
+              <>
+                <svg
+                  viewBox="0 0 135 135"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="#525252"
+                  className="w-10 h-10"
+                >
+                  <path d="M67.447 58c5.523 0 10-4.477 10-10s-4.477-10-10-10-10 4.477-10 10 4.477 10 10 10zm9.448 9.447c0 5.523 4.477 10 10 10 5.522 0 10-4.477 10-10s-4.478-10-10-10c-5.523 0-10 4.477-10 10zm-9.448 9.448c-5.523 0-10 4.477-10 10 0 5.522 4.477 10 10 10s10-4.478 10-10c0-5.523-4.477-10-10-10zM58 67.447c0-5.523-4.477-10-10-10s-10 4.477-10 10 4.477 10 10 10 10-4.477 10-10z">
+                    <animateTransform
+                      attributeName="transform"
+                      type="rotate"
+                      from="0 67 67"
+                      to="-360 67 67"
+                      dur="2.5s"
+                      repeatCount="indefinite"
+                    />
+                  </path>
+                  <path d="M28.19 40.31c6.627 0 12-5.374 12-12 0-6.628-5.373-12-12-12-6.628 0-12 5.372-12 12 0 6.626 5.372 12 12 12zm30.72-19.825c4.686 4.687 12.284 4.687 16.97 0 4.686-4.686 4.686-12.284 0-16.97-4.686-4.687-12.284-4.687-16.97 0-4.687 4.686-4.687 12.284 0 16.97zm35.74 7.705c0 6.627 5.37 12 12 12 6.626 0 12-5.373 12-12 0-6.628-5.374-12-12-12-6.63 0-12 5.372-12 12zm19.822 30.72c-4.686 4.686-4.686 12.284 0 16.97 4.687 4.686 12.285 4.686 16.97 0 4.687-4.686 4.687-12.284 0-16.97-4.685-4.687-12.283-4.687-16.97 0zm-7.704 35.74c-6.627 0-12 5.37-12 12 0 6.626 5.373 12 12 12s12-5.374 12-12c0-6.63-5.373-12-12-12zm-30.72 19.822c-4.686-4.686-12.284-4.686-16.97 0-4.686 4.687-4.686 12.285 0 16.97 4.686 4.687 12.284 4.687 16.97 0 4.687-4.685 4.687-12.283 0-16.97zm-35.74-7.704c0-6.627-5.372-12-12-12-6.626 0-12 5.373-12 12s5.374 12 12 12c6.628 0 12-5.373 12-12zm-19.823-30.72c4.687-4.686 4.687-12.284 0-16.97-4.686-4.686-12.284-4.686-16.97 0-4.687 4.686-4.687 12.284 0 16.97 4.686 4.687 12.284 4.687 16.97 0z">
+                    <animateTransform
+                      attributeName="transform"
+                      type="rotate"
+                      from="0 67 67"
+                      to="360 67 67"
+                      dur="8s"
+                      repeatCount="indefinite"
+                    />
+                  </path>
+                </svg>
+              </>
+            )}
+          </>
+        ) : (
+          <>
+            {!loading ? (
+              <>
+                <div className="p-2">
+                  <h1 className="text-xl flex justify-center text-center items-baseline py-2">
+                    Here is a{" "}
+                    <span className="text-3xl px-2 font-bold bg-gradient-to-r from-purple-500 to-blue-500 text-transparent bg-clip-text">
+                      cat
+                    </span>{" "}
+                    fact for you
+                  </h1>
+                  <p className="text-sm py-2 text-justify">{apiData}</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <svg
+                  viewBox="0 0 135 135"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="#525252"
+                  className="w-10 h-10"
+                >
+                  <path d="M67.447 58c5.523 0 10-4.477 10-10s-4.477-10-10-10-10 4.477-10 10 4.477 10 10 10zm9.448 9.447c0 5.523 4.477 10 10 10 5.522 0 10-4.477 10-10s-4.478-10-10-10c-5.523 0-10 4.477-10 10zm-9.448 9.448c-5.523 0-10 4.477-10 10 0 5.522 4.477 10 10 10s10-4.478 10-10c0-5.523-4.477-10-10-10zM58 67.447c0-5.523-4.477-10-10-10s-10 4.477-10 10 4.477 10 10 10 10-4.477 10-10z">
+                    <animateTransform
+                      attributeName="transform"
+                      type="rotate"
+                      from="0 67 67"
+                      to="-360 67 67"
+                      dur="2.5s"
+                      repeatCount="indefinite"
+                    />
+                  </path>
+                  <path d="M28.19 40.31c6.627 0 12-5.374 12-12 0-6.628-5.373-12-12-12-6.628 0-12 5.372-12 12 0 6.626 5.372 12 12 12zm30.72-19.825c4.686 4.687 12.284 4.687 16.97 0 4.686-4.686 4.686-12.284 0-16.97-4.686-4.687-12.284-4.687-16.97 0-4.687 4.686-4.687 12.284 0 16.97zm35.74 7.705c0 6.627 5.37 12 12 12 6.626 0 12-5.373 12-12 0-6.628-5.374-12-12-12-6.63 0-12 5.372-12 12zm19.822 30.72c-4.686 4.686-4.686 12.284 0 16.97 4.687 4.686 12.285 4.686 16.97 0 4.687-4.686 4.687-12.284 0-16.97-4.685-4.687-12.283-4.687-16.97 0zm-7.704 35.74c-6.627 0-12 5.37-12 12 0 6.626 5.373 12 12 12s12-5.374 12-12c0-6.63-5.373-12-12-12zm-30.72 19.822c-4.686-4.686-12.284-4.686-16.97 0-4.686 4.687-4.686 12.285 0 16.97 4.686 4.687 12.284 4.687 16.97 0 4.687-4.685 4.687-12.283 0-16.97zm-35.74-7.704c0-6.627-5.372-12-12-12-6.626 0-12 5.373-12 12s5.374 12 12 12c6.628 0 12-5.373 12-12zm-19.823-30.72c4.687-4.686 4.687-12.284 0-16.97-4.686-4.686-12.284-4.686-16.97 0-4.687 4.686-4.687 12.284 0 16.97 4.686 4.687 12.284 4.687 16.97 0z">
+                    <animateTransform
+                      attributeName="transform"
+                      type="rotate"
+                      from="0 67 67"
+                      to="360 67 67"
+                      dur="8s"
+                      repeatCount="indefinite"
+                    />
+                  </path>
+                </svg>
+              </>
+            )}
+          </>
+        )}
       </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    </div>
+  );
 }
