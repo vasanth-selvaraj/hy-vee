@@ -19,7 +19,8 @@ This app has the following features:
 Allows the user to `select` an option (dog or cat) in a form.
 Fetches data from the selected API and displays it on the page.
 Supports `dark` and `light` mode.
-Technologies Used
+
+## Technologies Used
 This app uses the following technologies:
 
 - Next.js
