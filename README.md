@@ -2,6 +2,7 @@
 This is a simple `Next.js` app that showcases an image of a dog or a fact on a cat based on the user’s selection in a form. The app uses the following APIs:
 
 [https://catfact.ninja/fact](https://catfact.ninja/fact)
+
 [https://dog.ceo/api/breeds/image/random](https://dog.ceo/api/breeds/image/random)
 
 ## Getting Started
