@@ -49,7 +49,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col gap-8 h-screen w-screen items-center p-10">
-      <div
+      <form
         className={`flex flex-col gap-2 items-center justify-center p-4 transition-all duration-500 ease-in-out ${
           selected !== "" ? "h-40 w-1/2" : "h-full w-1/2"
         }`}
@@ -63,7 +63,7 @@ export default function Home() {
           <option value="Dog">Dog</option>
           <option value="Cat">Cat</option>
         </select>
-      </div>
+      </form>
       <div
         className={`border border-gray-300 bg-gradient-to-r dark:from-neutral-800 dark:to-neutral-900 from-gray-100 to-gray-200 shadow-md dark:bg-neutral-800 dark:border-neutral-700 flex justify-center items-center p-4 rounded ${
           selected !== "" ? "flex opacity-100" : "opacity-0"
